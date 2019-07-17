@@ -1,4 +1,5 @@
 import * as THREE from './build/three.module.js';
+import Stats from './code/jsm/libs/stats.module.js';
 
 var sceneWidth;
 var sceneHeight;
@@ -8,6 +9,9 @@ var renderer;
 var dom;
 var sun;
 var dino;
+
+const DINOSCALE = 0.15;
+
 // var orbitControl;
 var rollingGroundSphere;
 var heroSphere;
@@ -34,7 +38,7 @@ var particleGeometry;
 var particleCount = 20;
 var explosionPower = 1.06;
 var particles;
-// var stats;
+var stats;
 var scoreText;
 var score;
 var hasCollided;
@@ -71,8 +75,8 @@ function createScene() {
 	renderer.setSize(sceneWidth, sceneHeight);
 	dom = document.getElementById('container');
 	dom.appendChild(renderer.domElement);
-	// stats = new Stats();
-	// dom.appendChild(stats.dom);
+	stats = new Stats();
+	dom.appendChild(stats.dom);
 	createTreesPool();
 	addWorld();
 	addHero();
@@ -209,7 +213,7 @@ function addHero() {
         //var dinoObject = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
 
 		// Scale the size of the dino
-		const DINOSCALE = 0.1;
+		
         dinoObject.scale.set(DINOSCALE, DINOSCALE, DINOSCALE);
         dinoObject.rotation.y = Math.PI;
 		//dinoObject.position.set(30, 0, -400);
@@ -241,8 +245,8 @@ function addWorld() {
 	var sides = 40;
 	var tiers = 40;
 	var sphereGeometry = new THREE.SphereGeometry(worldRadius, sides, tiers);
-	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xfffafa, flatShading: true });
-
+	// var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xfffafa, flatShading: true });
+	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x696969, flatShading: true });
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
 	var nextVertexVector = new THREE.Vector3();
@@ -349,10 +353,10 @@ function createTree() {
 	//var midPointVector = treeGeometry.vertices[0].clone();
 	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
 	tightenTree(treeGeometry.vertices, sides, 1);
-	// blowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
-	// tightenTree(treeGeometry.vertices, sides, 3);
-	// blowUpTree(treeGeometry.vertices, sides, 4, scalarMultiplier * 1.2);
-	// tightenTree(treeGeometry.vertices, sides, 5);
+	blowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
+	tightenTree(treeGeometry.vertices, sides, 3);
+	blowUpTree(treeGeometry.vertices, sides, 4, scalarMultiplier * 1.2);
+	tightenTree(treeGeometry.vertices, sides, 5);
 	var treeTop = new THREE.Mesh(treeGeometry, treeMaterial);
 	treeTop.castShadow = true;
 	treeTop.receiveShadow = false;
@@ -414,7 +418,7 @@ function tightenTree(vertices, sides, currentTier) {
 }
 
 function update() {
-	//stats.update();
+	stats.update();
 	//animate
 
 	rollingGroundSphere.rotation.x += rollingSpeed;
