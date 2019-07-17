@@ -245,7 +245,6 @@ function addWorld() {
 	var sides = 40;
 	var tiers = 40;
 	var sphereGeometry = new THREE.SphereGeometry(worldRadius, sides, tiers);
-	// var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xfffafa, flatShading: true });
 	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x696969, flatShading: true });
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
