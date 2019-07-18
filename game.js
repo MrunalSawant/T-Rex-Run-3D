@@ -11,14 +11,12 @@ var sun;
 var dino;
 
 const DINOSCALE = 0.15;
+const WORLDRADIUS = 26;
 
 // var orbitControl;
 var rollingGroundSphere;
-var heroSphere;
 var rollingSpeed = 0.005;
-var heroRollingSpeed;
-var worldRadius = 26;
-var heroRadius = 0.2;
+
 var sphericalHelper;
 var pathAngleValues;
 var heroBaseY = 1.75;
@@ -60,7 +58,7 @@ function createScene() {
 	
 	clock = new THREE.Clock();
 	clock.start();
-	heroRollingSpeed = (rollingSpeed * worldRadius / heroRadius) / 5;
+
 	sphericalHelper = new THREE.Spherical();
 	pathAngleValues = [1.52, 1.57, 1.62];
 	sceneWidth = window.innerWidth;
@@ -171,41 +169,33 @@ function handleKeyDown(keyEvent) {
 
 //Function to add SnowBall
 function addHero() {
-
-	var sphereGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
-	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xe5f2f2, flatShading: true })
+	
 	jumping = false;
-	heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-	heroSphere.receiveShadow = true;
-	heroSphere.castShadow = true;
-
 	const loader = new THREE.ObjectLoader()
 	loader.load('./models/dino.json', function (dinoObject) {
 
 		// Scale the size of the dino
         dinoObject.scale.set(DINOSCALE, DINOSCALE, DINOSCALE);
         dinoObject.rotation.y = Math.PI;
-		dinoObject.name = "dino";
 		scene.add(dinoObject);
 		dino = dinoObject;
-		// dino = scene.getObjectByName("dino");
+		
 		dino.receiveShadow = true;
 		dino.castShadow = true;
-	});
+		
+		dino.position.y = heroBaseY;
+		dino.position.z = 4.8;
+		currentLane = middleLane;
+		dino.position.x = currentLane;
 	
-	heroSphere.position.y = heroBaseY;
-	heroSphere.position.z = 4.8;
-	currentLane = middleLane;
-	heroSphere.position.x = currentLane;
+	});
 
-	if(dino !== undefined)
-		dino.position.copy(heroSphere.position.clone());
 }
 
 function addWorld() {
 	var sides = 40;
 	var tiers = 40;
-	var sphereGeometry = new THREE.SphereGeometry(worldRadius, sides, tiers);
+	var sphereGeometry = new THREE.SphereGeometry(WORLDRADIUS, sides, tiers);
 	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x696969, flatShading: true });
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
@@ -285,7 +275,7 @@ function addTree(inPath, row, isLeft) {
 		newTree.visible = true;
 		//console.log("add tree");
 		treesInPath.push(newTree);
-		sphericalHelper.set(worldRadius - 0.3, pathAngleValues[row], -rollingGroundSphere.rotation.x + 4);
+		sphericalHelper.set(WORLDRADIUS - 0.3, pathAngleValues[row], -rollingGroundSphere.rotation.x + 4);
 	} else {
 		newTree = createTree();
 		var forestAreaAngle = 0;//[1.52,1.57,1.62];
@@ -294,7 +284,7 @@ function addTree(inPath, row, isLeft) {
 		} else {
 			forestAreaAngle = 1.46 - Math.random() * 0.1;
 		}
-		sphericalHelper.set(worldRadius - 0.3, forestAreaAngle, row);
+		sphericalHelper.set(WORLDRADIUS - 0.3, forestAreaAngle, row);
 	}
 	newTree.position.setFromSpherical(sphericalHelper);
 	var rollingGroundVector = rollingGroundSphere.position.clone().normalize();
@@ -378,20 +368,19 @@ function tightenTree(vertices, sides, currentTier) {
 }
 
 function update() {
+	
 	stats.update();
-	//animate
-
 	rollingGroundSphere.rotation.x += rollingSpeed;
-	heroSphere.rotation.x -= heroRollingSpeed;
 	if(dino !== undefined)
-		dino.position.copy(heroSphere.position.clone());
-
-	if (heroSphere.position.y <= heroBaseY) {
-		jumping = false;
-		bounceValue = (Math.random() * 0.04) + 0.005;
+	{
+		if (dino.position.y <= heroBaseY) {
+			jumping = false;
+			bounceValue = (Math.random() * 0.04) + 0.005;
+		}
+		dino.position.y += bounceValue;
+		dino.position.x = THREE.Math.lerp(dino.position.x, currentLane, 2 * clock.getDelta());
 	}
-	heroSphere.position.y += bounceValue;
-	heroSphere.position.x = THREE.Math.lerp(heroSphere.position.x, currentLane, 2 * clock.getDelta());//clock.getElapsedTime());
+
 	bounceValue -= gravity;
 	if (clock.getElapsedTime() > treeReleaseInterval) {
 		clock.start();
@@ -409,6 +398,7 @@ function update() {
 	if(running)
 		requestAnimationFrame(update);//request next update
 }
+
 function doTreeLogic() {
 	var oneTree;
 	var treePos = new THREE.Vector3();
@@ -419,7 +409,7 @@ function doTreeLogic() {
 		if (treePos.z > 6 && oneTree.visible) {//gone out of our view zone
 			treesToRemove.push(oneTree);
 		} else {//check collision
-			if (treePos.distanceTo(heroSphere.position) <= 0.6) {
+			if (dino !== undefined && treePos.distanceTo(dino.position) <= 0.6) {
 				console.log("hit");
 				hasCollided = true;
 				//explode();
@@ -437,6 +427,8 @@ function doTreeLogic() {
 		console.log("remove tree");
 	});
 }
+
+//Logic of explosion
 function doExplosionLogic() {
 	if (particles === undefined || !particles.visible) return;
 	for (var i = 0; i < particleCount; i++) {
@@ -452,7 +444,9 @@ function doExplosionLogic() {
 function explode() {
 	particles.position.y = 2;
 	particles.position.z = 4.8;
-	particles.position.x = heroSphere.position.x;
+	if(dino !== undefined)
+		particles.position.x = dino.position.x;
+	
 	for (var i = 0; i < particleCount; i++) {
 		var vertex = new THREE.Vector3();
 		vertex.x = -0.2 + Math.random() * 0.4;
