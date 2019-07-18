@@ -208,28 +208,13 @@ function addHero() {
 	const loader = new THREE.ObjectLoader()
 	loader.load('./models/dino.json', function (dinoObject) {
 
-
-        // Get the geometry and materials from the JSON
-        //var dinoObject = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
-
 		// Scale the size of the dino
-		
         dinoObject.scale.set(DINOSCALE, DINOSCALE, DINOSCALE);
         dinoObject.rotation.y = Math.PI;
-		//dinoObject.position.set(30, 0, -400);
 		
 		dinoObject.name = "dino";
         scene.add(dinoObject);
-		//camera.position.z = 50;
-        //position.setFromMatrixPosition(dino.matrixWorld);
         dino = scene.getObjectByName("dino");
-
-        // Model is loaded, switch from "Loading..." to instruction text
-        //instructions.innerHTML = "<strong>Click to Play!</strong> </br></br> W,A,S,D or arrow keys = move </br>Mouse = look around";
-
-        // Call the animate function so that animation begins after the model is loaded
-		//animate();
-		//requestAnimationFrame(update);
 	});
 	
 	heroSphere.position.y = heroBaseY;
