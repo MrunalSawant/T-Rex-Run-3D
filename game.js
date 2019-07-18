@@ -21,7 +21,7 @@ var worldRadius = 26;
 var heroRadius = 0.2;
 var sphericalHelper;
 var pathAngleValues;
-var heroBaseY = 1.8;
+var heroBaseY = 1.75;
 var bounceValue = 0.1;
 var gravity = 0.005;
 var leftLane = -1;
@@ -75,6 +75,7 @@ function createScene() {
 	renderer.setSize(sceneWidth, sceneHeight);
 	dom = document.getElementById('container');
 	dom.appendChild(renderer.domElement);
+	scoreText = document.getElementById('scoreValue');
 	stats = new Stats();
 	dom.appendChild(stats.dom);
 	createTreesPool();
@@ -88,32 +89,6 @@ function createScene() {
 	camera.position.y = 2.5;
 	window.addEventListener('resize', onWindowResize, false);//resize callback
 	document.onkeydown = handleKeyDown;
-	displayScore();
-
-}
-
-function displayScore() {
-
-	scoreText = document.createElement('div');
-	scoreText.style.position = 'absolute';
-	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
-	scoreText.style.width = 100;
-	scoreText.style.height = 100;
-	//scoreText.style.backgroundColor = "blue";
-	scoreText.innerHTML = "0";
-	scoreText.style.top = 50 + 'px';
-	scoreText.style.left = 10 + 'px';
-	document.body.appendChild(scoreText);
-
-	// var infoText = document.createElement('div');
-	// infoText.style.position = 'absolute';
-	// infoText.style.width = 100;
-	// infoText.style.height = 100;
-	// infoText.style.backgroundColor = "yellow";
-	// infoText.innerHTML = "UP - Jump, Left/Right - Move";
-	// infoText.style.top = 10 + 'px';
-	// infoText.style.left = 10 + 'px';
-	// document.body.appendChild(infoText);
 }
 
 function addExplosion() {
@@ -203,18 +178,19 @@ function addHero() {
 	heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 	heroSphere.receiveShadow = true;
 	heroSphere.castShadow = true;
-	//scene.add(heroSphere);
-	// const loader = new THREE.ObjectLoader();
+
 	const loader = new THREE.ObjectLoader()
 	loader.load('./models/dino.json', function (dinoObject) {
 
 		// Scale the size of the dino
         dinoObject.scale.set(DINOSCALE, DINOSCALE, DINOSCALE);
         dinoObject.rotation.y = Math.PI;
-		
 		dinoObject.name = "dino";
-        scene.add(dinoObject);
-        dino = scene.getObjectByName("dino");
+		scene.add(dinoObject);
+		dino = dinoObject;
+		// dino = scene.getObjectByName("dino");
+		dino.receiveShadow = true;
+		dino.castShadow = true;
 	});
 	
 	heroSphere.position.y = heroBaseY;
@@ -420,10 +396,12 @@ function update() {
 	if (clock.getElapsedTime() > treeReleaseInterval) {
 		clock.start();
 		addPathTree();
-		if (!hasCollided) {
-			score += 2 * treeReleaseInterval;
-			scoreText.innerHTML = score.toString();
-		}
+		// if (!hasCollided) {
+		// 	score += 2 * treeReleaseInterval;
+		// 	scoreText.innerHTML = score.toString();
+		// }
+		score += 2 * treeReleaseInterval;
+		scoreText.innerHTML = score.toString();
 	}
 	doTreeLogic();
 	doExplosionLogic();
