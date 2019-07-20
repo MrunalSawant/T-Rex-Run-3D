@@ -20,7 +20,7 @@ const HERO_BASE_Y = 1.75;
 const LEFT_LANE = -1;
 const RIGHT_LANE = 1;
 const MIDDLE_LANE = 0;
-const PARTICLE_COUNT = 20;
+const PARTICLE_COUNT = 50;
 
 var rollingGroundSphere;
 var sphericalHelper;
@@ -71,7 +71,8 @@ function createScene() {
 	renderer.shadowMap.enabled = true;//enable shadow
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	renderer.setSize(sceneWidth, sceneHeight);
-	dom = document.getElementById('container');
+	renderer.setPixelRatio(window.devicePixelRatio);
+	dom = document.getElementById('container'); 
 	dom.appendChild(renderer.domElement);
 	scoreText = document.getElementById('scoreValue');
 	stats = new Stats();
@@ -96,8 +97,8 @@ function addExplosion() {
 		particleGeometry.vertices.push(vertex);
 	}
 	var pMaterial = new THREE.ParticleBasicMaterial({
-		color: 0xfffafa,
-		size: 0.2
+		color: 0xff0000,
+		size: 0.08
 	});
 
 	particleGeometry.morphAttributes = {};
@@ -290,7 +291,7 @@ function addTree(inPath, row, isLeft) {
 	var treeVector = newTree.position.clone().normalize();
 	newTree.quaternion.setFromUnitVectors(treeVector, rollingGroundVector);
 	newTree.rotation.x += (Math.random() * (2 * Math.PI / 10)) + -Math.PI / 10;
-
+	newTree.updateMatrixWorld();
 	rollingGroundSphere.add(newTree);
 }
 function createTree() {
@@ -402,17 +403,23 @@ function update() {
 		}
 		else if (frameSkip > 30) {
 			running = false;
-			alert("GameOver the score is " + score);
+			//alert("GameOver the score is " + score);
 			gameOverFlag = false;
 
-			location.reload();
+			//location.reload();
 		}
 		++frameSkip;
 	}
 	render();
 	requestAnimationFrame(update);//request next update
+
 }
 
+function restart() {
+	//score should reset to zero
+	score = 0;
+	
+}
 function doTreeLogic() {
 	var oneTree;
 	var treePos = new THREE.Vector3();
@@ -476,12 +483,7 @@ function explode() {
 function render() {
 	renderer.render(scene, camera);//draw
 }
-function gameOver() {
 
-	// cancelAnimationFrame(globalRenderID);
-
-	// window.clearInterval(powerupSpawnIntervalID);
-}
 function onWindowResize() {
 	//resize & align
 	sceneHeight = window.innerHeight;
