@@ -46,17 +46,36 @@ init();
 
 function init() {
 	// set up the scene
+	initUI();
 	createScene();
-
+	createTreesPool();
+	addWorld();
+	addHero();
+	addLight();
+	createTree();
+	addExplosion();
 	//call game loop
 	update();
 }
 
+function initUI(){
+
+	dom = document.getElementById('container'); 
+	gameOverDom = document.getElementById('gameover');
+	scoreText = document.getElementById('scoreValue');
+	
+	stats = new Stats();
+	dom.appendChild(stats.dom);
+
+	window.addEventListener('resize', onWindowResize, false);//resize callback
+	document.onkeydown = handleKeyDown;
+}
 
 function createScene() {
+	
 	hasCollided = false;
 	score = 0;
-
+	
 	clock = new THREE.Clock();
 	clock.start();
 
@@ -66,30 +85,19 @@ function createScene() {
 	sceneHeight = window.innerHeight;
 	scene = new THREE.Scene();//the 3d scene
 	scene.fog = new THREE.FogExp2(0xf0fff0, 0.14);
+	
 	camera = new THREE.PerspectiveCamera(60, sceneWidth / sceneHeight, 0.1, 1000);//perspective camera
+	camera.position.z = 6.5;
+	camera.position.y = 2.5;
+
 	renderer = new THREE.WebGLRenderer({ alpha: true });//renderer with transparent backdrop
 	renderer.setClearColor(0xfffafa, 1);
 	renderer.shadowMap.enabled = true;//enable shadow
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	renderer.setSize(sceneWidth, sceneHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
-	dom = document.getElementById('container'); 
-	gameOverDom = document.getElementById('gameover');
 	dom.appendChild(renderer.domElement);
-	scoreText = document.getElementById('scoreValue');
-	stats = new Stats();
-	dom.appendChild(stats.dom);
-	createTreesPool();
-	addWorld();
-	addHero();
-	addLight();
-	createTree();
-	addExplosion();
-
-	camera.position.z = 6.5;
-	camera.position.y = 2.5;
-	window.addEventListener('resize', onWindowResize, false);//resize callback
-	document.onkeydown = handleKeyDown;
+	
 }
 
 function addExplosion() {
@@ -112,7 +120,7 @@ function createTreesPool() {
 
 	treesInPath = [];
 	treesPool = [];
-	var maxTreesInPool = 10;
+	var maxTreesInPool = 6;
 	var newTree;
 	for (var i = 0; i < maxTreesInPool; i++) {
 		newTree = createTree();
@@ -298,17 +306,20 @@ function addTree(inPath, row, isLeft) {
 }
 function createTree() {
 	var sides = 8;
-	var tiers = 6;
+	var tiers = 4;
 	var scalarMultiplier = (Math.random() * (0.25 - 0.1)) + 0.05;
-	var treeGeometry = new THREE.ConeGeometry(0.5, 1, sides, tiers);
+	var min=1; 
+    var max=1.5;  
+    var randomHeight = Math.random() * (+max - +min) + +min;
+	var treeGeometry = new THREE.ConeGeometry(0.5, randomHeight, sides, tiers);
 	var treeMaterial = new THREE.MeshStandardMaterial({ color: 0x33ff33, flatShading: true });
 	//var midPointVector = treeGeometry.vertices[0].clone();
 	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
 	tightenTree(treeGeometry.vertices, sides, 1);
 	blowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
 	tightenTree(treeGeometry.vertices, sides, 3);
-	blowUpTree(treeGeometry.vertices, sides, 4, scalarMultiplier * 1.2);
-	tightenTree(treeGeometry.vertices, sides, 5);
+	//blowUpTree(treeGeometry.vertices, sides, 4, scalarMultiplier * 1.2);
+	//tightenTree(treeGeometry.vertices, sides, 5);
 	var treeTop = new THREE.Mesh(treeGeometry, treeMaterial);
 	treeTop.castShadow = true;
 	treeTop.receiveShadow = false;
@@ -406,10 +417,10 @@ function update() {
 		}
 		else if (frameSkip > 30) {
 			running = false;
-			//alert("GameOver the score is " + score);
+			alert("GameOver the score is " + score);
 			gameOverFlag = false;
 
-			//location.reload();
+			location.reload();
 		}
 		++frameSkip;
 	}
