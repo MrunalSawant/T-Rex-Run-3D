@@ -41,6 +41,7 @@ var hasCollided;
 var running = true;
 var gameOverFlag = false;
 var frameSkip = 0;
+var gameOverDom;
 init();
 
 function init() {
@@ -73,6 +74,7 @@ function createScene() {
 	renderer.setSize(sceneWidth, sceneHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	dom = document.getElementById('container'); 
+	gameOverDom = document.getElementById('gameover');
 	dom.appendChild(renderer.domElement);
 	scoreText = document.getElementById('scoreValue');
 	stats = new Stats();
@@ -260,12 +262,12 @@ function addPathTree() {
 	}
 }
 function addWorldTrees() {
-	// var numTrees = 36;
-	// var gap = 6.28 / 36;
-	// for (var i = 0; i < numTrees; i++) {
-	// 	addTree(false, i * gap, true);
-	// 	addTree(false, i * gap, false);
-	// }
+	var numTrees = 36;
+	var gap = 6.28 / 36;
+	for (var i = 0; i < numTrees; i++) {
+		addTree(false, i * gap, true);
+		addTree(false, i * gap, false);
+	}
 }
 function addTree(inPath, row, isLeft) {
 	var newTree;
@@ -398,6 +400,7 @@ function update() {
 	}
 
 	if (gameOverFlag) {
+		
 		if (dino.visible) {
 			dino.visible = false;
 		}
@@ -434,6 +437,7 @@ function doTreeLogic() {
 				console.log("hit");
 				hasCollided = true;
 				explode();
+				gameOverDom.style.visibility = "visible";
 				//gameOver();
 			}
 		}
