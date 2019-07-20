@@ -1,6 +1,14 @@
 
 @import url('https://fonts.googleapis.com/css?family=Voltaire');
 
+#container{
+  position: absolute;
+  width:100%;
+  height: 100%;
+  background-color: #dbe6e6;
+  /* overflow: hidden; */
+}
+
 #score{
   position:absolute;
   left:50%;
