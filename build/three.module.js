@@ -1,3 +1,5 @@
+import * as THREE from '../code/jsm/loaders/deprecated/LegacyJSONLoader.js';
+
 // Polyfills
 
 if ( Number.EPSILON === undefined ) {
