@@ -7,7 +7,6 @@ var camera;
 var scene;
 var renderer;
 var dom;
-var sun;
 var dino;
 
 //Constants Initialization
@@ -42,6 +41,17 @@ var running = true;
 var gameOverFlag = false;
 var frameSkip = 0;
 var gameOverDom;
+
+const color = {
+	renderderBackground : 0xfffafa,
+	red : 0xff0000,
+	treeColor : 0x33ff33,
+	trunkColor : 0x886633,
+	sphereColor : 0x696969,
+	hemisphereLightColor:0xfffafa,
+	directionalLightColor:0xcdc1c5
+}
+
 init();
 
 function init() {
@@ -91,7 +101,7 @@ function createScene() {
 	camera.position.y = 2.5;
 
 	renderer = new THREE.WebGLRenderer({ alpha: true });//renderer with transparent backdrop
-	renderer.setClearColor(0xfffafa, 1);
+	renderer.setClearColor(color.renderderBackground, 1);
 	renderer.shadowMap.enabled = true;//enable shadow
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	renderer.setSize(sceneWidth, sceneHeight);
@@ -107,7 +117,7 @@ function addExplosion() {
 		particleGeometry.vertices.push(vertex);
 	}
 	var pMaterial = new THREE.ParticleBasicMaterial({
-		color: 0xff0000,
+		color: color.red,
 		size: 0.08
 	});
 
@@ -206,7 +216,7 @@ function addWorld() {
 	var sides = 40;
 	var tiers = 40;
 	var sphereGeometry = new THREE.SphereGeometry(WORLD_RADIUS, sides, tiers);
-	var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x696969, flatShading: true });
+	var sphereMaterial = new THREE.MeshStandardMaterial({ color: color.sphereColor, flatShading: true });
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
 	var nextVertexVector = new THREE.Vector3();
@@ -247,10 +257,11 @@ function addWorld() {
 	addWorldTrees();
 }
 function addLight() {
-	var hemisphereLight = new THREE.HemisphereLight(0xfffafa, 0x000000, .9)
+	var hemisphereLight = new THREE.HemisphereLight(color.hemisphereLightColor, .9)
 	scene.add(hemisphereLight);
-	sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
+	var sun = new THREE.DirectionalLight(color.directionalLightColor, 0.9);
 	sun.position.set(12, 6, -7);
+	//sun.position.set(0, 0, 7);
 	sun.castShadow = true;
 	scene.add(sun);
 	//Set up shadow properties for the sun light
@@ -260,7 +271,7 @@ function addLight() {
 	sun.shadow.camera.far = 50;
 }
 function addPathTree() {
-	var options = [0, 1, 2];
+	var options = [LEFT_LANE, MIDDLE_LANE, RIGHT_LANE];
 	var lane = Math.floor(Math.random() * 3);
 	addTree(true, lane);
 	options.splice(lane, 1);
@@ -308,11 +319,11 @@ function createTree() {
 	var sides = 8;
 	var tiers = 4;
 	var scalarMultiplier = (Math.random() * (0.25 - 0.1)) + 0.05;
-	var min=1; 
-    var max=1.5;  
-    var randomHeight = Math.random() * (+max - +min) + +min;
-	var treeGeometry = new THREE.ConeGeometry(0.5, randomHeight, sides, tiers);
-	var treeMaterial = new THREE.MeshStandardMaterial({ color: 0x33ff33, flatShading: true });
+	// var min=1; 
+    // var max=1.5;  
+    // var randomHeight = Math.random() * (+max - +min) + +min;
+	var treeGeometry = new THREE.ConeGeometry(0.5, 1, sides, tiers);
+	var treeMaterial = new THREE.MeshStandardMaterial({ color: color.treeColor, flatShading: true });
 	//var midPointVector = treeGeometry.vertices[0].clone();
 	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
 	tightenTree(treeGeometry.vertices, sides, 1);
@@ -326,7 +337,7 @@ function createTree() {
 	treeTop.position.y = 0.9;
 	treeTop.rotation.y = (Math.random() * (Math.PI));
 	var treeTrunkGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5);
-	var trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x886633, flatShading: true });
+	var trunkMaterial = new THREE.MeshStandardMaterial({ color: color.trunkColor, flatShading: true });
 	var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
 	treeTrunk.position.y = 0.25;
 	var tree = new THREE.Object3D();
@@ -438,11 +449,11 @@ function doTreeLogic() {
 	var oneTree;
 	var treePos = new THREE.Vector3();
 	var treesToRemove = [];
-	treesInPath.forEach(function (element, index) {
-		oneTree = treesInPath[index];
-		treePos.setFromMatrixPosition(oneTree.matrixWorld);
-		if (treePos.z > 6 && oneTree.visible) {//gone out of our view zone
-			treesToRemove.push(oneTree);
+	treesInPath.forEach(function (tree) {
+		// oneTree = treesInPath[index];
+		treePos.setFromMatrixPosition(tree.matrixWorld);
+		if (treePos.z > 6 && tree.visible) {//gone out of our view zone
+			treesToRemove.push(tree);
 		} else {//check collision
 			if (dino !== undefined && treePos.distanceTo(dino.position) <= 0.6) {
 				console.log("hit");
@@ -454,12 +465,11 @@ function doTreeLogic() {
 		}
 	});
 	var fromWhere;
-	treesToRemove.forEach(function (element, index) {
-		oneTree = treesToRemove[index];
-		fromWhere = treesInPath.indexOf(oneTree);
+	treesToRemove.forEach(function (tree,index) {
+		fromWhere = index;
 		treesInPath.splice(fromWhere, 1);
-		treesPool.push(oneTree);
-		oneTree.visible = false;
+		treesPool.push(tree);
+		tree.visible = false;
 		console.log("remove tree");
 	});
 }
