@@ -9,6 +9,24 @@
   /* overflow: hidden; */
 }
 
+#gameover{
+  visibility: hidden;
+  position:absolute;
+  font-family:'Voltaire', sans-serif;
+  font-weight:bold;
+  text-transform: uppercase;
+  font-size:120px;
+  text-align:center;
+  color:#f0630c;
+  left:50%;
+  top:25%;
+  width:100%;
+  user-select: none;
+  opacity:1;
+  transform : translate(-50%,-50%);
+  transition: all 500ms ease-in-out;
+}
+
 #score{
   position:absolute;
   left:50%;
@@ -32,7 +50,7 @@
 #scoreValue{
   position:relative;
   text-transform:uppercase;
-  color:#dc5f45;
+  color:#5f9042;
   font-size:40px;
   font-family:'Voltaire';
   text-align:center;
