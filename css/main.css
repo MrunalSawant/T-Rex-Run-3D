@@ -55,3 +55,17 @@
   font-family:'Voltaire';
   text-align:center;
 }
+
+#pause{
+  position: absolute;;
+  text-transform:uppercase;
+  color:#5974ee;
+  font-size:100px;
+  font-family:'Voltaire';
+  text-align:center;
+  top: 50%;
+  left:50%;
+  visibility: hidden;
+  transform : translate(-50%,-50%);
+  transition: all;
+}
