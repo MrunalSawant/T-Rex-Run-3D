@@ -6,8 +6,12 @@ var sceneHeight;
 var camera;
 var scene;
 var renderer;
-var dom;
+
 var dino;
+
+var dom;
+var pauseDom;
+var gameOverDom;
 
 //Constants Initialization
 const DINO_SCALE = 0.15;
@@ -40,7 +44,6 @@ var hasCollided;
 var running = true;
 var gameOverFlag = false;
 var frameSkip = 0;
-var gameOverDom;
 
 const color = {
 	renderderBackground : 0xfffafa,
@@ -60,7 +63,7 @@ function init() {
 	createScene();
 	createTreesPool();
 	addWorld();
-	addHero();
+	addDino();
 	addLight();
 	createTree();
 	addExplosion();
@@ -73,7 +76,8 @@ function initUI(){
 	dom = document.getElementById('container'); 
 	gameOverDom = document.getElementById('gameover');
 	scoreText = document.getElementById('scoreValue');
-	
+	pauseDom = document.getElementById('pause');
+
 	stats = new Stats();
 	dom.appendChild(stats.dom);
 
@@ -130,7 +134,7 @@ function createTreesPool() {
 
 	treesInPath = [];
 	treesPool = [];
-	var maxTreesInPool = 6;
+	var maxTreesInPool = 10;
 	var newTree;
 	for (var i = 0; i < maxTreesInPool; i++) {
 		newTree = createTree();
@@ -148,9 +152,11 @@ function handleKeyDown(keyEvent) {
 			//Space Button
 			//Pause a game
 			console.log('in pause game event');
-
-			running = !running;
+			
+			running = running ? false: true;
 			validMove = running;
+			pauseDom.style.visibility = !running ? "visible" : "hidden";
+			bounceValue = 0;
 			update();
 			break;
 		}
@@ -189,7 +195,7 @@ function handleKeyDown(keyEvent) {
 }
 
 //Function to add SnowBall
-function addHero() {
+function addDino() {
 
 	jumping = false;
 	const loader = new THREE.ObjectLoader()
@@ -393,6 +399,8 @@ function tightenTree(vertices, sides, currentTier) {
 
 function update() {
 
+	if(running === false)
+		return;
 	if (running) {
 		stats.update();
 		rollingGroundSphere.rotation.x += ROLLING_SPEED;
@@ -446,7 +454,6 @@ function restart() {
 	
 }
 function doTreeLogic() {
-	var oneTree;
 	var treePos = new THREE.Vector3();
 	var treesToRemove = [];
 	treesInPath.forEach(function (tree) {
