@@ -134,7 +134,7 @@ function createTreesPool() {
 
 	treesInPath = [];
 	treesPool = [];
-	var maxTreesInPool = 10;
+	var maxTreesInPool = 8;
 	var newTree;
 	for (var i = 0; i < maxTreesInPool; i++) {
 		newTree = createTree();
@@ -181,16 +181,18 @@ function handleKeyDown(keyEvent) {
 			break;
 		}
 		case 38: {
-			bounceValue = 0.1;
+			bounceValue = 0.12;
 			jumping = true;
 			break;
 		}
 		default: validMove = false;
 	}
 
-	if (validMove) {
+	if (validMove && !jumping ) {
+		
 		jumping = true;
 		bounceValue = 0.08;
+			
 	}
 }
 
