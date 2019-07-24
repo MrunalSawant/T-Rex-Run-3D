@@ -1,0 +1,6 @@
+1) Add an html text and apply css for Game Over. (Done)
+2) Replace Tree with Cactus
+3) Add a logic to reload the game.
+4) Add a restart png in html
+5) Add a pause event (Done)
+6) Add Energy Bar ( About 5 Collision is Okay)
