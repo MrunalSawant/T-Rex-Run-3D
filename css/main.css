@@ -2,6 +2,8 @@
 @import url('https://fonts.googleapis.com/css?family=Voltaire');
 
 #container{
+  left: 0px;
+  top: 0px;
   position: absolute;
   width:100%;
   height: 100%;
