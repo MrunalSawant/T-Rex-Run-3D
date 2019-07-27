@@ -14,12 +14,12 @@ var pauseDom;
 var gameOverDom;
 
 //Constants Initialization
-const DINO_SCALE = 0.012;
+const DINO_SCALE = 0.15;
 const WORLD_RADIUS = 26;
 const TREE_RELEASE_INTERVAL = 0.5;
 const GRAVITY = 0.005;
 const ROLLING_SPEED = 0.005; // This won't be constant after First Phase
-const HERO_BASE_Y = 2.2;
+const HERO_BASE_Y = 1.75;
 const LEFT_LANE = -1;
 const RIGHT_LANE = 1;
 const MIDDLE_LANE = 0;
@@ -149,7 +149,7 @@ function createTreesPool() {
 
 //Key Event Handler
 function handleKeyDown(keyEvent) {
-	// if (jumping) return;
+	if (jumping) return;
 	var validMove = true;
 
 	switch (keyEvent.keyCode) {
@@ -219,11 +219,11 @@ function addDino() {
 
 	jumping = false;
 	const loader = new THREE.ObjectLoader()
-	loader.load('./models/coloreddino.json', function (dinoObject) {
+	loader.load('./models/dino.json', function (dinoObject) {
 
 		// Scale the size of the dino
-		dinoObject.scale.set(DINO_SCALE, DINO_SCALE, DINO_SCALE-0.002);
-		// dinoObject.rotation.y = Math.PI;
+		dinoObject.scale.set(DINO_SCALE, DINO_SCALE, DINO_SCALE);
+		dinoObject.rotation.y = Math.PI;
 		scene.add(dinoObject);
 		dino = dinoObject;
 
@@ -437,20 +437,7 @@ function update() {
 
 	if (running === false)
 		return;
-
-	// var material = new THREE.LineBasicMaterial({
-	// 	color: 0x0000ff
-	// });
-
-	// var geometry = new THREE.Geometry();
-	// geometry.vertices.push(
-	// 	new THREE.Vector3( 0, 0, 0 ),
-	// 	new THREE.Vector3( 0, 5, 10 )
-	// );
-
-	// var line = new THREE.Line( geometry, material );
-	// scene.add( line );
-
+		
 	if (running) {
 		stats.update();
 		rollingGroundSphere.rotation.x += ROLLING_SPEED;
