@@ -14,16 +14,17 @@ var pauseDom;
 var gameOverDom;
 
 //Constants Initialization
-const DINO_SCALE = 0.15;
+const DINO_SCALE = 0.012;
 const WORLD_RADIUS = 26;
 const TREE_RELEASE_INTERVAL = 0.5;
 const GRAVITY = 0.005;
 const ROLLING_SPEED = 0.005; // This won't be constant after First Phase
-const HERO_BASE_Y = 1.75;
+const HERO_BASE_Y = 2.2;
 const LEFT_LANE = -1;
 const RIGHT_LANE = 1;
 const MIDDLE_LANE = 0;
 const PARTICLE_COUNT = 50;
+const JUMP_BOUNCE = 0.12;
 
 var rollingGroundSphere;
 var sphericalHelper;
@@ -45,14 +46,15 @@ var running = true;
 var gameOverFlag = false;
 var frameSkip = 0;
 
+
 const color = {
-	renderderBackground : 0xfffafa,
-	red : 0xff0000,
-	treeColor : 0x33ff33,
-	trunkColor : 0x886633,
-	sphereColor : 0x696969,
-	hemisphereLightColor:0xfffafa,
-	directionalLightColor:0xcdc1c5
+	renderderBackground: 0xfffafa,
+	red: 0xff0000,
+	treeColor: 0x33ff33,
+	trunkColor: 0x886633,
+	sphereColor: 0x696969,
+	hemisphereLightColor: 0xfffafa,
+	directionalLightColor: 0xcdc1c5
 }
 
 init();
@@ -71,9 +73,9 @@ function init() {
 	update();
 }
 
-function initUI(){
+function initUI() {
 
-	dom = document.getElementById('container'); 
+	dom = document.getElementById('container');
 	gameOverDom = document.getElementById('gameover');
 	scoreText = document.getElementById('scoreValue');
 	pauseDom = document.getElementById('pause');
@@ -81,15 +83,15 @@ function initUI(){
 	stats = new Stats();
 	dom.appendChild(stats.dom);
 
-	window.addEventListener('resize', onWindowResize, false);//resize callback
+	window.addEventListener('resize', onWindowResize, false); //resize callback
 	document.onkeydown = handleKeyDown;
 }
 
 function createScene() {
-	
+
 	hasCollided = false;
 	score = 0;
-	
+
 	clock = new THREE.Clock();
 	clock.start();
 
@@ -97,21 +99,23 @@ function createScene() {
 	pathAngleValues = [1.52, 1.57, 1.62];
 	sceneWidth = window.innerWidth;
 	sceneHeight = window.innerHeight;
-	scene = new THREE.Scene();//the 3d scene
+	scene = new THREE.Scene(); //the 3d scene
 	scene.fog = new THREE.FogExp2(0xf0fff0, 0.14);
-	
-	camera = new THREE.PerspectiveCamera(60, sceneWidth / sceneHeight, 0.1, 1000);//perspective camera
+
+	camera = new THREE.PerspectiveCamera(60, sceneWidth / sceneHeight, 0.1, 1000); //perspective camera
 	camera.position.z = 6.5;
 	camera.position.y = 2.5;
 
-	renderer = new THREE.WebGLRenderer({ alpha: true });//renderer with transparent backdrop
+	renderer = new THREE.WebGLRenderer({
+		alpha: true
+	}); //renderer with transparent backdrop
 	renderer.setClearColor(color.renderderBackground, 1);
-	renderer.shadowMap.enabled = true;//enable shadow
+	renderer.shadowMap.enabled = true; //enable shadow
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	renderer.setSize(sceneWidth, sceneHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	dom.appendChild(renderer.domElement);
-	
+
 }
 
 function addExplosion() {
@@ -130,6 +134,7 @@ function addExplosion() {
 	scene.add(particles);
 	particles.visible = false;
 }
+
 function createTreesPool() {
 
 	treesInPath = [];
@@ -144,7 +149,7 @@ function createTreesPool() {
 
 //Key Event Handler
 function handleKeyDown(keyEvent) {
-	if (jumping) return;
+	// if (jumping) return;
 	var validMove = true;
 
 	switch (keyEvent.keyCode) {
@@ -152,8 +157,8 @@ function handleKeyDown(keyEvent) {
 			//Space Button
 			//Pause a game
 			console.log('in pause game event');
-			
-			running = running ? false: true;
+
+			running = running ? false : true;
 			validMove = running;
 			pauseDom.style.visibility = !running ? "visible" : "hidden";
 			bounceValue = 0;
@@ -181,18 +186,31 @@ function handleKeyDown(keyEvent) {
 			break;
 		}
 		case 38: {
-			bounceValue = 0.12;
-			jumping = true;
+			if (dino.position.y <= HERO_BASE_Y + 0.5 + enhancements.flyparameter.value || !jumping) {
+				bounceValue = JUMP_BOUNCE;
+				jumping = true;
+				break;
+			}
+		}
+		case 67: {
+			if (keyEvent.altKey && keyEvent.shiftKey && keyEvent.ctrlKey) {
+				var value = prompt("Cheat Code");
+				var dataObj = enhancements.find(obj => obj.code == value);
+				if (dataObj) {
+					dataObj.obj.Toggle();
+				}
+			}
 			break;
 		}
-		default: validMove = false;
+		default:
+			validMove = false;
 	}
 
-	if (validMove && !jumping ) {
-		
+	if (validMove && !jumping) {
+
 		jumping = true;
 		bounceValue = 0.08;
-			
+
 	}
 }
 
@@ -201,11 +219,11 @@ function addDino() {
 
 	jumping = false;
 	const loader = new THREE.ObjectLoader()
-	loader.load('./models/dino.json', function (dinoObject) {
+	loader.load('./models/coloreddino.json', function (dinoObject) {
 
 		// Scale the size of the dino
-		dinoObject.scale.set(DINO_SCALE, DINO_SCALE, DINO_SCALE);
-		dinoObject.rotation.y = Math.PI;
+		dinoObject.scale.set(DINO_SCALE, DINO_SCALE, DINO_SCALE-0.002);
+		// dinoObject.rotation.y = Math.PI;
 		scene.add(dinoObject);
 		dino = dinoObject;
 
@@ -224,7 +242,10 @@ function addWorld() {
 	var sides = 40;
 	var tiers = 40;
 	var sphereGeometry = new THREE.SphereGeometry(WORLD_RADIUS, sides, tiers);
-	var sphereMaterial = new THREE.MeshStandardMaterial({ color: color.sphereColor, flatShading: true });
+	var sphereMaterial = new THREE.MeshStandardMaterial({
+		color: color.sphereColor,
+		flatShading: true
+	});
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
 	var nextVertexVector = new THREE.Vector3();
@@ -264,6 +285,7 @@ function addWorld() {
 	rollingGroundSphere.position.z = 2;
 	addWorldTrees();
 }
+
 function addLight() {
 	var hemisphereLight = new THREE.HemisphereLight(color.hemisphereLightColor, .9)
 	scene.add(hemisphereLight);
@@ -278,6 +300,7 @@ function addLight() {
 	sun.shadow.camera.near = 0.5;
 	sun.shadow.camera.far = 50;
 }
+
 function addPathTree() {
 	var options = [LEFT_LANE, MIDDLE_LANE, RIGHT_LANE];
 	var lane = Math.floor(Math.random() * 3);
@@ -288,6 +311,7 @@ function addPathTree() {
 		addTree(true, options[lane]);
 	}
 }
+
 function addWorldTrees() {
 	var numTrees = 36;
 	var gap = 6.28 / 36;
@@ -296,6 +320,7 @@ function addWorldTrees() {
 		addTree(false, i * gap, false);
 	}
 }
+
 function addTree(inPath, row, isLeft) {
 	var newTree;
 	if (inPath) {
@@ -307,7 +332,7 @@ function addTree(inPath, row, isLeft) {
 		sphericalHelper.set(WORLD_RADIUS - 0.3, pathAngleValues[row], -rollingGroundSphere.rotation.x + 4);
 	} else {
 		newTree = createTree();
-		var forestAreaAngle = 0;//[1.52,1.57,1.62];
+		var forestAreaAngle = 0; //[1.52,1.57,1.62];
 		if (isLeft) {
 			forestAreaAngle = 1.68 + Math.random() * 0.1;
 		} else {
@@ -323,15 +348,19 @@ function addTree(inPath, row, isLeft) {
 	newTree.updateMatrixWorld();
 	rollingGroundSphere.add(newTree);
 }
+
 function createTree() {
 	var sides = 8;
 	var tiers = 4;
 	var scalarMultiplier = (Math.random() * (0.25 - 0.1)) + 0.05;
 	// var min=1; 
-    // var max=1.5;  
-    // var randomHeight = Math.random() * (+max - +min) + +min;
+	// var max=1.5;  
+	// var randomHeight = Math.random() * (+max - +min) + +min;
 	var treeGeometry = new THREE.ConeGeometry(0.5, 1, sides, tiers);
-	var treeMaterial = new THREE.MeshStandardMaterial({ color: color.treeColor, flatShading: true });
+	var treeMaterial = new THREE.MeshStandardMaterial({
+		color: color.treeColor,
+		flatShading: true
+	});
 	//var midPointVector = treeGeometry.vertices[0].clone();
 	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
 	tightenTree(treeGeometry.vertices, sides, 1);
@@ -345,7 +374,10 @@ function createTree() {
 	treeTop.position.y = 0.9;
 	treeTop.rotation.y = (Math.random() * (Math.PI));
 	var treeTrunkGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5);
-	var trunkMaterial = new THREE.MeshStandardMaterial({ color: color.trunkColor, flatShading: true });
+	var trunkMaterial = new THREE.MeshStandardMaterial({
+		color: color.trunkColor,
+		flatShading: true
+	});
 	var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
 	treeTrunk.position.y = 0.25;
 	var tree = new THREE.Object3D();
@@ -353,6 +385,7 @@ function createTree() {
 	tree.add(treeTop);
 	return tree;
 }
+
 function blowUpTree(vertices, sides, currentTier, scalarMultiplier, odd) {
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
@@ -384,6 +417,7 @@ function blowUpTree(vertices, sides, currentTier, scalarMultiplier, odd) {
 		}
 	}
 }
+
 function tightenTree(vertices, sides, currentTier) {
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
@@ -401,8 +435,22 @@ function tightenTree(vertices, sides, currentTier) {
 
 function update() {
 
-	if(running === false)
+	if (running === false)
 		return;
+
+	// var material = new THREE.LineBasicMaterial({
+	// 	color: 0x0000ff
+	// });
+
+	// var geometry = new THREE.Geometry();
+	// geometry.vertices.push(
+	// 	new THREE.Vector3( 0, 0, 0 ),
+	// 	new THREE.Vector3( 0, 5, 10 )
+	// );
+
+	// var line = new THREE.Line( geometry, material );
+	// scene.add( line );
+
 	if (running) {
 		stats.update();
 		rollingGroundSphere.rotation.x += ROLLING_SPEED;
@@ -432,11 +480,10 @@ function update() {
 	}
 
 	if (gameOverFlag) {
-		
+
 		if (dino.visible) {
 			dino.visible = false;
-		}
-		else if (frameSkip > 30) {
+		} else if (frameSkip > 30) {
 			running = false;
 			alert("GameOver the score is " + score);
 			gameOverFlag = false;
@@ -446,26 +493,42 @@ function update() {
 		++frameSkip;
 	}
 	render();
-	requestAnimationFrame(update);//request next update
+	requestAnimationFrame(update); //request next update
 
 }
 
 function restart() {
 	//score should reset to zero
 	score = 0;
-	
+
 }
+
 function doTreeLogic() {
+	if (dino !== undefined) {
+		if (enhancements.drunk.value) {
+			camera.position.x = dino.position.x;
+			camera.position.y = dino.position.y + 1;
+			camera.position.z = dino.position.z + 2 - factor * (dino.position.y - HERO_BASE_Y);
+			camera.up = new THREE.Vector3(0, 0, -5);
+			camera.lookAt(new THREE.Vector3(0, 4 - dino.position.y, 0));
+		} else {
+			 camera.position.x = 0;
+			camera.position.y = dino.position.y + 1;
+			camera.position.z = dino.position.z + 2 - factor * (dino.position.y - HERO_BASE_Y);
+			camera.up = new THREE.Vector3(0, 0, -5);
+			camera.lookAt(new THREE.Vector3(0, 0, 0));
+		}
+	}
 	var treePos = new THREE.Vector3();
 	var treesToRemove = [];
 	treesInPath.forEach(function (tree) {
 		// oneTree = treesInPath[index];
 		treePos.setFromMatrixPosition(tree.matrixWorld);
-		if (treePos.z > 6 && tree.visible) {//gone out of our view zone
+		if (treePos.z > 6 && tree.visible) { //gone out of our view zone
 			treesToRemove.push(tree);
-		} else {//check collision
+		} else { //check collision
 			if (dino !== undefined && treePos.distanceTo(dino.position) <= 0.6) {
-				console.log("hit");
+				//onsole.log("hit");
 				hasCollided = true;
 				explode();
 				gameOverDom.style.visibility = "visible";
@@ -474,7 +537,7 @@ function doTreeLogic() {
 		}
 	});
 	var fromWhere;
-	treesToRemove.forEach(function (tree,index) {
+	treesToRemove.forEach(function (tree, index) {
 		fromWhere = index;
 		treesInPath.splice(fromWhere, 1);
 		treesPool.push(tree);
@@ -496,6 +559,7 @@ function doExplosionLogic() {
 	}
 	particleGeometry.verticesNeedUpdate = true;
 }
+
 function explode() {
 	particles.position.y = 2;
 	particles.position.z = 4.8;
@@ -514,8 +578,9 @@ function explode() {
 	particles.visible = true;
 	gameOverFlag = true;
 }
+
 function render() {
-	renderer.render(scene, camera);//draw
+	renderer.render(scene, camera); //draw
 }
 
 function onWindowResize() {
