@@ -164,7 +164,7 @@ function handleKeyDown(keyEvent) {
 			bounceValue = 0;
 			update();
 			break;
-		}
+		}//Left Arrow Key
 		case 37: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = LEFT_LANE;
@@ -175,6 +175,7 @@ function handleKeyDown(keyEvent) {
 			}
 			break;
 		}
+		//Right Arrow Key
 		case 39: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = RIGHT_LANE;
@@ -185,6 +186,7 @@ function handleKeyDown(keyEvent) {
 			}
 			break;
 		}
+		//Up Arrow Key
 		case 38: {
 			if (dino.position.y <= HERO_BASE_Y + 0.5 + enhancements.flyparameter.value || !jumping) {
 				bounceValue = JUMP_BOUNCE;
@@ -438,33 +440,30 @@ function update() {
 	if (running === false)
 		return;
 		
-	if (running) {
-		stats.update();
-		rollingGroundSphere.rotation.x += ROLLING_SPEED;
-		if (dino !== undefined) {
-			if (dino.position.y <= HERO_BASE_Y) {
-				jumping = false;
-				bounceValue = (Math.random() * 0.04) + 0.005;
-			}
-			dino.position.y += bounceValue;
-			dino.position.x = THREE.Math.lerp(dino.position.x, currentLane, 2 * clock.getDelta());
-		}
 
-		bounceValue -= GRAVITY;
-		if (clock.getElapsedTime() > TREE_RELEASE_INTERVAL) {
-			clock.start();
-			addPathTree();
-			// if (!hasCollided) {
-			// 	score += 2 * TREE_RELEASE_INTERVAL;
-			// 	scoreText.innerHTML = score.toString();
-			// }
+	stats.update();
+	rollingGroundSphere.rotation.x += ROLLING_SPEED;
+	if (dino !== undefined) {
+		if (dino.position.y <= HERO_BASE_Y) {
+			jumping = false;
+			bounceValue = (Math.random() * 0.04) + 0.005;
+		}
+		dino.position.y += bounceValue;
+		dino.position.x = THREE.Math.lerp(dino.position.x, currentLane, 2 * clock.getDelta());
+	}
+
+	bounceValue -= GRAVITY;
+	if (clock.getElapsedTime() > TREE_RELEASE_INTERVAL) {
+		clock.start();
+		addPathTree();
+		if (!hasCollided) {
 			score += 2 * TREE_RELEASE_INTERVAL;
 			scoreText.innerHTML = score.toString();
 		}
-		doTreeLogic();
-		doExplosionLogic();
-
 	}
+
+	doTreeLogic();
+	doExplosionLogic();
 
 	if (gameOverFlag) {
 
@@ -479,6 +478,7 @@ function update() {
 		}
 		++frameSkip;
 	}
+
 	render();
 	requestAnimationFrame(update); //request next update
 
@@ -499,7 +499,7 @@ function doTreeLogic() {
 			camera.up = new THREE.Vector3(0, 0, -5);
 			camera.lookAt(new THREE.Vector3(0, 4 - dino.position.y, 0));
 		} else {
-			 camera.position.x = 0;
+			camera.position.x = 0;
 			camera.position.y = dino.position.y + 1;
 			camera.position.z = dino.position.z + 2 - factor * (dino.position.y - HERO_BASE_Y);
 			camera.up = new THREE.Vector3(0, 0, -5);
