@@ -45,6 +45,14 @@ var running = true;
 var gameOverFlag = false;
 var frameSkip = 0;
 
+
+const KeyCode = {
+	SPACE: 32,
+	UP:38,
+	LEFT:37,
+	RIGHT:39
+}
+
 const color = {
 	renderderBackground : 0xfffafa,
 	red : 0xff0000,
@@ -148,7 +156,7 @@ function handleKeyDown(keyEvent) {
 	var validMove = true;
 
 	switch (keyEvent.keyCode) {
-		case 32: {
+		case KeyCode.SPACE: {
 			//Space Button
 			//Pause a game
 			console.log('in pause game event');
@@ -160,7 +168,7 @@ function handleKeyDown(keyEvent) {
 			update();
 			break;
 		}
-		case 37: {
+		case KeyCode.LEFT: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = LEFT_LANE;
 			} else if (currentLane == RIGHT_LANE) {
@@ -170,7 +178,7 @@ function handleKeyDown(keyEvent) {
 			}
 			break;
 		}
-		case 39: {
+		case KeyCode.RIGHT: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = RIGHT_LANE;
 			} else if (currentLane == LEFT_LANE) {
@@ -180,7 +188,7 @@ function handleKeyDown(keyEvent) {
 			}
 			break;
 		}
-		case 38: {
+		case KeyCode.UP: {
 			bounceValue = 0.12;
 			jumping = true;
 			break;
