@@ -1,9 +1,9 @@
-import * as THREE from '../build/three.module.js';
+import * as THREE from '/build/three.module.js'
 
 var sceneWidth;
 var sceneHeight;
 var camera;
-var scene;
+var scene : THREE.Scene;
 var renderer;
 
 var dino;
@@ -122,10 +122,11 @@ function createScene() {
 }
 
 function addExplosion() {
-	particleGeometry = new THREE.Geometry();
+	particleGeometry = new THREE.BufferGeometry();
 	for (var i = 0; i < PARTICLE_COUNT; i++) {
 		var vertex = new THREE.Vector3();
 		particleGeometry.vertices.push(vertex);
+	
 	}
 	var pMaterial = new THREE.PointsMaterial({
 		color: color.red,
@@ -208,7 +209,7 @@ function addDino() {
 
 	jumping = false;
 	const loader = new THREE.ObjectLoader();
-	
+
 	loader.load('./models/dino.json', function (dinoObject) {
 
 		// Scale the size of the dino
@@ -232,7 +233,7 @@ function addWorld() {
 	var sides = 40;
 	var tiers = 40;
 	var sphereGeometry = new THREE.SphereGeometry(WORLD_RADIUS, sides, tiers);
-	var sphereMaterial = new THREE.MeshStandardMaterial({ color: color.sphereColor, flatShading: true });
+	var sphereMaterial = new THREE.MeshBasicMaterial({ color: color.sphereColor, flatShading: true });
 	var vertexIndex;
 	var vertexVector = new THREE.Vector3();
 	var nextVertexVector = new THREE.Vector3();
@@ -289,11 +290,11 @@ function addLight() {
 function addPathTree() {
 	var options = [LEFT_LANE, MIDDLE_LANE, RIGHT_LANE];
 	var lane = Math.floor(Math.random() * 3);
-	addTree(true, lane);
+	addTree(true, lane, false);
 	options.splice(lane, 1);
 	if (Math.random() > 0.5) {
 		lane = Math.floor(Math.random() * 2);
-		addTree(true, options[lane]);
+		addTree(true, options[lane], false);
 	}
 }
 function addWorldTrees() {
@@ -304,7 +305,7 @@ function addWorldTrees() {
 		addTree(false, i * gap, false);
 	}
 }
-function addTree(inPath, row, isLeft) {
+function addTree(inPath : boolean, row : number, isLeft : boolean) {
 	var newTree;
 	if (inPath) {
 		if (treesPool.length == 0) return;
@@ -339,9 +340,9 @@ function createTree() {
     // var max=1.5;  
     // var randomHeight = Math.random() * (+max - +min) + +min;
 	var treeGeometry = new THREE.ConeGeometry(0.5, 1, sides, tiers);
-	var treeMaterial = new THREE.MeshStandardMaterial({ color: color.treeColor, flatShading: true });
+	var treeMaterial = new THREE.MeshBasicMaterial({ color: color.treeColor, flatShading: true });
 	//var midPointVector = treeGeometry.vertices[0].clone();
-	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
+	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier, false);
 	tightenTree(treeGeometry.vertices, sides, 1);
 	blowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
 	tightenTree(treeGeometry.vertices, sides, 3);
@@ -353,7 +354,7 @@ function createTree() {
 	treeTop.position.y = 0.9;
 	treeTop.rotation.y = (Math.random() * (Math.PI));
 	var treeTrunkGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5);
-	var trunkMaterial = new THREE.MeshStandardMaterial({ color: color.trunkColor, flatShading: true });
+	var trunkMaterial = new THREE.MeshBasicMaterial({ color: color.trunkColor, flatShading: true });
 	var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
 	treeTrunk.position.y = 0.25;
 	var tree = new THREE.Object3D();
