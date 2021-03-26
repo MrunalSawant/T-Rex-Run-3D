@@ -1,5 +1,4 @@
-import * as THREE from './build/three.module.js';
-import Stats from './code/jsm/libs/stats.module.js';
+import * as THREE from '../build/three.module.js';
 
 var sceneWidth;
 var sceneHeight;
@@ -86,8 +85,8 @@ function initUI(){
 	scoreText = document.getElementById('scoreValue');
 	pauseDom = document.getElementById('pause');
 
-	stats = new Stats();
-	dom.appendChild(stats.dom);
+	// stats = new Stats();
+	// dom.appendChild(stats.dom);
 
 	window.addEventListener('resize', onWindowResize, false);//resize callback
 	document.onkeydown = handleKeyDown;
@@ -128,7 +127,7 @@ function addExplosion() {
 		var vertex = new THREE.Vector3();
 		particleGeometry.vertices.push(vertex);
 	}
-	var pMaterial = new THREE.ParticleBasicMaterial({
+	var pMaterial = new THREE.PointsMaterial({
 		color: color.red,
 		size: 0.08
 	});
@@ -208,7 +207,8 @@ function handleKeyDown(keyEvent) {
 function addDino() {
 
 	jumping = false;
-	const loader = new THREE.ObjectLoader()
+	const loader = new THREE.ObjectLoader();
+	
 	loader.load('./models/dino.json', function (dinoObject) {
 
 		// Scale the size of the dino
@@ -412,7 +412,7 @@ function update() {
 	if(running === false)
 		return;
 	if (running) {
-		stats.update();
+	//	stats.update();
 		rollingGroundSphere.rotation.x += ROLLING_SPEED;
 		if (dino !== undefined) {
 			if (dino.position.y <= HERO_BASE_Y) {

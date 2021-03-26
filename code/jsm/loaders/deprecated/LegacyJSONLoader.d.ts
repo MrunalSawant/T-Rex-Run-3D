@@ -2,7 +2,7 @@ import {
   Geometry,
   LoadingManager,
   Material
-} from '../../../../src/Three';
+} from '../../../../build/Three';
 
 export interface LegacyJSONLoaderResult {
   geometry: Geometry;
