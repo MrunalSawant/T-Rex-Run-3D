@@ -1,5 +1,5 @@
 # T-Rex-Run-3D
-To create a 3D version of No Internet T-Rex game using THREE.js
+3D version of No Internet T-Rex game using THREE.js
 
 ## Things To Do
 1) To create a 3D T-Rex Dinosour with animations and export it in GLTF format.
