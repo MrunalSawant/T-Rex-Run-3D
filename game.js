@@ -18,7 +18,7 @@ const DINO_SCALE = 0.15;
 const WORLD_RADIUS = 26;
 const TREE_RELEASE_INTERVAL = 0.5;
 const GRAVITY = 0.005;
-const ROLLING_SPEED = 0.005; // This won't be constant after First Phase
+let ROLLING_SPEED = 0.005; // This won't be constant after First Phase
 const HERO_BASE_Y = 1.75;
 const LEFT_LANE = -1;
 const RIGHT_LANE = 1;
@@ -50,7 +50,9 @@ const KeyCode = {
 	SPACE: 32,
 	UP:38,
 	LEFT:37,
-	RIGHT:39
+	RIGHT:39,
+	A:65,
+	Z:90
 }
 
 const color = {
@@ -194,6 +196,14 @@ function handleKeyDown(keyEvent) {
 			jumping = false;
 			break;
 		}
+		case KeyCode.A :{
+			ROLLING_SPEED += 0.0025;
+			break;
+		}
+		case KeyCode.Z :{
+			ROLLING_SPEED -= 0.0025;
+			break;
+		}
 		default: validMove = false;
 	}
 
@@ -230,8 +240,8 @@ function addDino() {
 }
 
 function addWorld() {
-	var sides = 40;
-	var tiers = 40;
+	var sides = 100;
+	var tiers = 100;
 	var sphereGeometry = new THREE.SphereGeometry(WORLD_RADIUS, sides, tiers);
 	var sphereMaterial = new THREE.MeshStandardMaterial({ color: color.sphereColor, flatShading: true });
 	var vertexIndex;
@@ -261,7 +271,7 @@ function addWorld() {
 			}
 			heightValue = (Math.random() * maxHeight) - (maxHeight / 2);
 			offset = vertexVector.clone().normalize().multiplyScalar(heightValue);
-			sphereGeometry.vertices[i + vertexIndex] = (vertexVector.add(offset));
+			//sphereGeometry.vertices[i + vertexIndex] = (vertexVector.add(offset));
 		}
 	}
 	rollingGroundSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -343,8 +353,8 @@ function createTree() {
 	var treeMaterial = new THREE.MeshStandardMaterial({ color: color.treeColor, flatShading: true });
 	//var midPointVector = treeGeometry.vertices[0].clone();
 	blowUpTree(treeGeometry.vertices, sides, 0, scalarMultiplier);
-	tightenTree(treeGeometry.vertices, sides, 1);
-	blowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
+	//tightenTree(treeGeometry.vertices, sides, 1);
+	//varblowUpTree(treeGeometry.vertices, sides, 2, scalarMultiplier * 1.1, true);
 	tightenTree(treeGeometry.vertices, sides, 3);
 	//blowUpTree(treeGeometry.vertices, sides, 4, scalarMultiplier * 1.2);
 	//tightenTree(treeGeometry.vertices, sides, 5);
