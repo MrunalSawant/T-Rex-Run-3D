@@ -106,11 +106,11 @@ function createScene() {
 	sceneWidth = window.innerWidth;
 	sceneHeight = window.innerHeight;
 	scene = new THREE.Scene();//the 3d scene
-	scene.fog = new THREE.FogExp2(0xf0fff0, 0.14);
+	//scene.fog = new THREE.FogExp2(0xf0fff0, 0.14);
 	
 	camera = new THREE.PerspectiveCamera(60, sceneWidth / sceneHeight, 0.1, 1000);//perspective camera
-	camera.position.z = 6.5;
-	camera.position.y = 2.5;
+	camera.position.z = 7.5;
+	camera.position.y = 2.75;
 
 	renderer = new THREE.WebGLRenderer({ alpha: true });//renderer with transparent backdrop
 	renderer.setClearColor(color.renderderBackground, 1);
@@ -189,8 +189,9 @@ function handleKeyDown(keyEvent) {
 			break;
 		}
 		case KeyCode.UP: {
-			bounceValue = 0.12;
-			jumping = true;
+			//bounceValue = 0.12;
+			bounceValue = 0.0;
+			jumping = false;
 			break;
 		}
 		default: validMove = false;
@@ -198,9 +199,9 @@ function handleKeyDown(keyEvent) {
 
 	if (validMove && !jumping ) {
 		
-		jumping = true;
-		bounceValue = 0.08;
-			
+		jumping = false;
+		//bounceValue = 0.08;
+		bounceValue = 0.00;
 	}
 }
 
@@ -209,7 +210,7 @@ function addDino() {
 
 	jumping = false;
 	const loader = new THREE.ObjectLoader()
-	loader.load('./models/dino.json', function (dinoObject) {
+	loader.load('./models/shelby/1967-shelby-ford-mustang.json', function (dinoObject) {
 
 		// Scale the size of the dino
 		dinoObject.scale.set(DINO_SCALE, DINO_SCALE, DINO_SCALE);
@@ -276,7 +277,7 @@ function addLight() {
 	var hemisphereLight = new THREE.HemisphereLight(color.hemisphereLightColor, .9)
 	scene.add(hemisphereLight);
 	var sun = new THREE.DirectionalLight(color.directionalLightColor, 0.9);
-	sun.position.set(12, 6, -7);
+	sun.position.set(100, 6, -7);
 	//sun.position.set(0, 0, 7);
 	sun.castShadow = true;
 	scene.add(sun);
@@ -419,7 +420,7 @@ function update() {
 				jumping = false;
 				bounceValue = (Math.random() * 0.04) + 0.005;
 			}
-			dino.position.y += bounceValue;
+			//dino.position.y += bounceValue;
 			dino.position.x = THREE.Math.lerp(dino.position.x, currentLane, 2 * clock.getDelta());
 		}
 
@@ -461,6 +462,7 @@ function update() {
 function restart() {
 	//score should reset to zero
 	score = 0;
+	init();
 	
 }
 function doTreeLogic() {
