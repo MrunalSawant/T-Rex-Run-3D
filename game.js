@@ -165,7 +165,9 @@ function handleKeyDown(keyEvent) {
 			update();
 			break;
 		}//Left Arrow Key
-		case 37: {
+		case 37:
+		// A Key
+		case 65: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = LEFT_LANE;
 			} else if (currentLane == RIGHT_LANE) {
@@ -176,7 +178,9 @@ function handleKeyDown(keyEvent) {
 			break;
 		}
 		//Right Arrow Key
-		case 39: {
+		case 39:
+		// D Key
+		case 68: {
 			if (currentLane == MIDDLE_LANE) {
 				currentLane = RIGHT_LANE;
 			} else if (currentLane == LEFT_LANE) {
@@ -187,7 +191,9 @@ function handleKeyDown(keyEvent) {
 			break;
 		}
 		//Up Arrow Key
-		case 38: {
+		case 38:
+		// W Key
+		case 87: {
 			if (dino.position.y <= HERO_BASE_Y + 0.5 + enhancements.flyparameter.value || !jumping) {
 				bounceValue = JUMP_BOUNCE;
 				jumping = true;
