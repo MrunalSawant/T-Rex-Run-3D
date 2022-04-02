@@ -9,15 +9,14 @@ class SceneHandler {
     private _camera: THREE.PerspectiveCamera
     private _renderer!: THREE.WebGLRenderer
     public _modelManager: ModelManager;
-
-    private clock : THREE.Clock;
+    private _clock : THREE.Clock;
 
     public constructor() {
         this._scene = new THREE.Scene();
         this._modelManager = new ModelManager();
         this._camera = new THREE.PerspectiveCamera();
-        this.clock = new THREE.Clock();
-	    this.clock.start();
+        this._clock = new THREE.Clock();
+	    this._clock.start();
 
     }
 
@@ -40,7 +39,7 @@ class SceneHandler {
             alpha: true,
         }) //_renderer with transparent backdrop
 
-        this._renderer.setClearColor(CONSTANTS.color.renderderBackground, 1)
+       // this._renderer.setClearColor(CONSTANTS.color.renderderBackground, 1)
         this._renderer.shadowMap.enabled = true //enable shadow
         this._renderer.shadowMap.type = THREE.PCFSoftShadowMap
         this._renderer.setSize(sceneWidth, sceneHeight)
@@ -51,7 +50,7 @@ class SceneHandler {
         
         this.addLight()
 
-        this.addObject( this._modelManager.getHero() );
+        //this.addObject( this._modelManager.getHero() );
 
         this.addObject( this._modelManager.getWorld() );
 
@@ -90,17 +89,17 @@ class SceneHandler {
 
     public update() {
 
-        if (this.clock.getElapsedTime() > CONSTANTS.TREE_RELEASE_INTERVAL) {
-            this.clock.start();
+        if (this._clock.getElapsedTime() > CONSTANTS.TREE_RELEASE_INTERVAL) {
+            this._clock.start();
             this._modelManager.addPathTree();
             
         }
-    
-        this._modelManager.doTreeLogic();
         
+        this._modelManager.doTreeLogic();
+        this._modelManager.updateWorldRotation(1);
         this.render();
-        console.log('update')
-        requestAnimationFrame(this.update); //request next update
+        console.log('update');
+        requestAnimationFrame(this.update.bind(this)); //request next update
     
     }
 }

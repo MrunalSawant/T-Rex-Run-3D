@@ -6,7 +6,7 @@ import SceneManager from './SceneManager'
 var pathAngleValues: number[];
 var bounceValue = 0.1;
 var currentLane = CONSTANTS.MIDDLE_LANE;
-var clock: THREE.Clock;
+
 var jumping;
 var treesInPath: any[];
 var treesPool: THREE.Object3D<THREE.Event>[];
@@ -43,6 +43,7 @@ function createScene() {
 
     SceneManager.initScene(window.innerWidth,window.innerHeight);
     SceneManager.update();
+
     //@ts-ignore
     window.scene = SceneManager;
 }
@@ -136,9 +137,6 @@ function initUI() {
 // 	gameOverFlag = true;
 // }
 
-function render() {
-    SceneManager.render();
-}
 
 
 

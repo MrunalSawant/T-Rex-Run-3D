@@ -35,8 +35,8 @@ export default class ModelManager {
     }
 
     private createWorld(): THREE.Mesh {
-        const sides = 40
-        const tiers = 40
+        const sides = 160
+        const tiers = 160
 
         const sphereGeometry = new THREE.SphereGeometry(CONSTANTS.WORLD_RADIUS, sides, tiers)
         const sphereMaterial = new THREE.MeshStandardMaterial({
